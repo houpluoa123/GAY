@@ -1,0 +1,32 @@
+name: Windows Tailscale RDP/SSH
+
+on:
+  workflow_dispatch: # Chạy thủ công bằng nút bấm
+
+jobs:
+  remote-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Connect Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          args: --ssh
+
+      - name: Set Password & Show IP
+        shell: powershell
+        run: |
+          # 1. Đặt mật khẩu cho user runneradmin
+          net user runneradmin PassCuaBan123!
+
+          # 2. In IP Tailscale ra Log để bạn copy
+          $ip = tailscale ip -4
+          Write-Host "=========================================="
+          Write-Host "IP Tailscale cua may: $ip"
+          Write-Host "User: runneradmin"
+          Write-Host "Pass: PassCuaBan123!"
+          Write-Host "=========================================="
+
+      - name: Keep Alive (Giữ máy chạy trong 1 tiếng)
+        shell: powershell
+        run: Start-Sleep -Seconds 3600
